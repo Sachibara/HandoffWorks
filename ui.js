@@ -63,7 +63,9 @@ get('run').onclick=async()=>{
     let tags,mode='Rule-based routing';
     if(get('ai').checked){
       get('status').textContent='Loading the local model and routing statements…';
-      try{tags=await routeWithAI(lines);mode='Local AI routing'}catch{mode='Rule-based routing (local AI unavailable)'}
+      try{const inferred=await routeWithAI(lines);
+        tags=lines.map((line,i)=>{const explicit=rules(line);return explicit==='Context'?inferred[i]:explicit});
+        mode='Local AI routing with explicit action and risk checks'}catch{mode='Rule-based routing (local AI unavailable)'}
     }
     tags??=lines.map(rules);
     const group=name=>refs.filter((_,i)=>tags[i]===name);
